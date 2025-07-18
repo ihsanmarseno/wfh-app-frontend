@@ -8,20 +8,20 @@ Aplikasi ini berinteraksi dengan backend **microservices** seperti **User Servic
 ## ✨ Tampilan
 
 - Login Page (untuk login karyawan dan admin ke dalam sistem)
-![alt text](image.png)
+  ![alt text](image.png)
 
 - Daily Attendance (untuk melakukan absensi harian)
-![alt text](image-1.png)
-![alt text](image-2.png)
+  ![alt text](image-1.png)
+  ![alt text](image-2.png)
 
 - Attendance History (untuk melihat riwayat absensi)
-![alt text](image-3.png)
+  ![alt text](image-3.png)
 
 - Manage Employees (untuk admin untuk mengelola karyawan)
-![alt text](image-4.png)
+  ![alt text](image-4.png)
 
 - Attendance Control (untuk admin melihat absensi karyawan (view only))
-![alt text](image-5.png)
+  ![alt text](image-5.png)
 
 ## ✨ Fitur Utama
 
@@ -55,11 +55,29 @@ Halaman (view) untuk melihat riwayat absensi.
 
 ---
 
-## ⚙️ Cara Instalasi & Menjalankan
+## ⚙️ Cara Install & Jalankan
 
-### 1️⃣ Clone Repository
+### 1. Clone Repository
 
 ```bash
-git clone https://github.com/your-username/absensi-wfh-frontend.git
-cd absensi-wfh-frontend
+git clone https://github.com/ihsanmarseno/wfh-app-frontend.git
+cd /wfh-app-frontend
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Setup Environment Variables
+
+```bash
+VITE_USER_SERVICE_URL=http://localhost:5001/v1/api
+```
+
+### 6. Running Server
+
+```bash
+npm run dev
 ```
