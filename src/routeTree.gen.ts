@@ -26,8 +26,8 @@ import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_aut
 import { Route as ClerkauthRouteRouteImport } from './routes/clerk/(auth)/route'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
-import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
+import { Route as AuthenticatedHistoryIndexRouteImport } from './routes/_authenticated/history/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
@@ -38,6 +38,8 @@ import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
+import { Route as AuthenticatedAdminEmployeeIndexRouteImport } from './routes/_authenticated/admin/employee/index'
+import { Route as AuthenticatedAdminAttendanceIndexRouteImport } from './routes/_authenticated/admin/attendance/index'
 
 const ClerkRouteRoute = ClerkRouteRouteImport.update({
   id: '/clerk',
@@ -122,16 +124,17 @@ const AuthenticatedUsersIndexRoute = AuthenticatedUsersIndexRouteImport.update({
   path: '/users/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedTasksIndexRoute = AuthenticatedTasksIndexRouteImport.update({
-  id: '/tasks/',
-  path: '/tasks/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedSettingsIndexRoute =
   AuthenticatedSettingsIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
+const AuthenticatedHistoryIndexRoute =
+  AuthenticatedHistoryIndexRouteImport.update({
+    id: '/history/',
+    path: '/history/',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedHelpCenterIndexRoute =
   AuthenticatedHelpCenterIndexRouteImport.update({
@@ -189,6 +192,18 @@ const AuthenticatedSettingsAccountRoute =
     path: '/account',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedAdminEmployeeIndexRoute =
+  AuthenticatedAdminEmployeeIndexRouteImport.update({
+    id: '/admin/employee/',
+    path: '/admin/employee/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminAttendanceIndexRoute =
+  AuthenticatedAdminAttendanceIndexRouteImport.update({
+    id: '/admin/attendance/',
+    path: '/admin/attendance/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
@@ -215,9 +230,11 @@ export interface FileRoutesByFullPath {
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/history': typeof AuthenticatedHistoryIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
-  '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/admin/attendance': typeof AuthenticatedAdminAttendanceIndexRoute
+  '/admin/employee': typeof AuthenticatedAdminEmployeeIndexRoute
 }
 export interface FileRoutesByTo {
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
@@ -242,9 +259,11 @@ export interface FileRoutesByTo {
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/history': typeof AuthenticatedHistoryIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
-  '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/admin/attendance': typeof AuthenticatedAdminAttendanceIndexRoute
+  '/admin/employee': typeof AuthenticatedAdminEmployeeIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -274,9 +293,11 @@ export interface FileRoutesById {
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
+  '/_authenticated/history/': typeof AuthenticatedHistoryIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
-  '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/_authenticated/admin/attendance/': typeof AuthenticatedAdminAttendanceIndexRoute
+  '/_authenticated/admin/employee/': typeof AuthenticatedAdminEmployeeIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -305,9 +326,11 @@ export interface FileRouteTypes {
     | '/apps'
     | '/chats'
     | '/help-center'
+    | '/history'
     | '/settings/'
-    | '/tasks'
     | '/users'
+    | '/admin/attendance'
+    | '/admin/employee'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/clerk'
@@ -332,9 +355,11 @@ export interface FileRouteTypes {
     | '/apps'
     | '/chats'
     | '/help-center'
+    | '/history'
     | '/settings'
-    | '/tasks'
     | '/users'
+    | '/admin/attendance'
+    | '/admin/employee'
   id:
     | '__root__'
     | '/_authenticated'
@@ -363,9 +388,11 @@ export interface FileRouteTypes {
     | '/_authenticated/apps/'
     | '/_authenticated/chats/'
     | '/_authenticated/help-center/'
+    | '/_authenticated/history/'
     | '/_authenticated/settings/'
-    | '/_authenticated/tasks/'
     | '/_authenticated/users/'
+    | '/_authenticated/admin/attendance/'
+    | '/_authenticated/admin/employee/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -504,19 +531,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUsersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/tasks/': {
-      id: '/_authenticated/tasks/'
-      path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof AuthenticatedTasksIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/settings/': {
       id: '/_authenticated/settings/'
       path: '/'
       fullPath: '/settings/'
       preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
+    '/_authenticated/history/': {
+      id: '/_authenticated/history/'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AuthenticatedHistoryIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/help-center/': {
       id: '/_authenticated/help-center/'
@@ -588,6 +615,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/admin/employee/': {
+      id: '/_authenticated/admin/employee/'
+      path: '/admin/employee'
+      fullPath: '/admin/employee'
+      preLoaderRoute: typeof AuthenticatedAdminEmployeeIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/attendance/': {
+      id: '/_authenticated/admin/attendance/'
+      path: '/admin/attendance'
+      fullPath: '/admin/attendance'
+      preLoaderRoute: typeof AuthenticatedAdminAttendanceIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -620,8 +661,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
-  AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
+  AuthenticatedHistoryIndexRoute: typeof AuthenticatedHistoryIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
+  AuthenticatedAdminAttendanceIndexRoute: typeof AuthenticatedAdminAttendanceIndexRoute
+  AuthenticatedAdminEmployeeIndexRoute: typeof AuthenticatedAdminEmployeeIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -630,8 +673,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
-  AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
+  AuthenticatedHistoryIndexRoute: AuthenticatedHistoryIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
+  AuthenticatedAdminAttendanceIndexRoute:
+    AuthenticatedAdminAttendanceIndexRoute,
+  AuthenticatedAdminEmployeeIndexRoute: AuthenticatedAdminEmployeeIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie'
 import { Link } from '@tanstack/react-router'
 import {
   BadgeCheck,
@@ -35,6 +36,8 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
 
+  const name = Cookies.get('name')
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -46,7 +49,7 @@ export function NavUser({
             >
               <Avatar className='h-8 w-8 rounded-lg'>
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className='rounded-lg'>SN</AvatarFallback>
+                <AvatarFallback className='rounded-lg'>{name}</AvatarFallback>
               </Avatar>
               <div className='grid flex-1 text-left text-sm leading-tight'>
                 <span className='truncate font-semibold'>{user.name}</span>
@@ -102,7 +105,13 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              asChild
+              onClick={() => {
+                Cookies.remove('token')
+                window.location.href = '/sign-in'
+              }}
+            >
               <LogOut />
               Log out
             </DropdownMenuItem>

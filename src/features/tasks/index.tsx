@@ -1,18 +1,54 @@
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+import Cookies from 'js-cookie'
+import { Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { columns } from './components/columns'
-import { DataTable } from './components/data-table'
-import { TasksDialogs } from './components/tasks-dialogs'
-import { TasksPrimaryButtons } from './components/tasks-primary-buttons'
-import TasksProvider from './context/tasks-context'
-import { tasks } from './data/tasks'
 
-export default function Tasks() {
+interface Attendance {
+  id: number
+  clockInTime: string
+  photoUrl: string
+  status: 'Late' | 'On Time'
+}
+
+interface Meta {
+  totalItems: number
+  totalPages: number
+  currentPage: number
+  pageSize: number
+}
+
+export default function AttendanceHistory() {
+  const [attendances, setAttendances] = useState<Attendance[]>([])
+  const [meta, setMeta] = useState<Meta | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [page, setPage] = useState(1)
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null)
+
+  const fetchAttendance = async (pageNum: number) => {
+    setLoading(true)
+    const res = await axios.get(
+      `http://localhost:5002/v1/api/attendance/my-history?page=${pageNum}&pageSize=5`,
+      {
+        headers: { Authorization: `Bearer ${Cookies.get('token')}` },
+      }
+    )
+    setAttendances(res.data.data)
+    setMeta(res.data.meta)
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    fetchAttendance(page)
+  }, [page])
+
   return (
-    <TasksProvider>
+    <>
       <Header fixed>
         <Search />
         <div className='ml-auto flex items-center space-x-4'>
@@ -22,21 +58,132 @@ export default function Tasks() {
       </Header>
 
       <Main>
-        <div className='mb-2 flex flex-wrap items-center justify-between space-y-2 gap-x-4'>
+        <div className='mb-4 flex flex-wrap items-center justify-between gap-y-2'>
           <div>
-            <h2 className='text-2xl font-bold tracking-tight'>Tasks</h2>
+            <h2 className='text-2xl font-bold tracking-tight'>
+              Attendance History
+            </h2>
             <p className='text-muted-foreground'>
-              Here&apos;s a list of your tasks for this month!
+              Review your clock-in records and submitted photos.
             </p>
           </div>
-          <TasksPrimaryButtons />
         </div>
-        <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
-          <DataTable data={tasks} columns={columns} />
-        </div>
-      </Main>
 
-      <TasksDialogs />
-    </TasksProvider>
+        <div className='-mx-4 flex-1 overflow-auto px-4 py-2'>
+          {loading ? (
+            <div className='flex justify-center p-8'>
+              <Loader2 className='text-muted-foreground h-8 w-8 animate-spin' />
+            </div>
+          ) : (
+            <div className='overflow-x-auto rounded-md border shadow-sm'>
+              <table className='w-full text-left'>
+                <thead className='bg-muted text-sm'>
+                  <tr>
+                    <th className='p-3'>Date</th>
+                    <th className='p-3'>Time</th>
+                    <th className='p-3'>Status</th>
+                    <th className='p-3'>Photo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {attendances.map((att) => {
+                    const date = new Date(att.clockInTime)
+                    return (
+                      <tr key={att.id} className='hover:bg-muted/30 border-b'>
+                        <td className='p-3'>
+                          {new Intl.DateTimeFormat('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          }).format(date)}
+                        </td>
+                        <td className='p-3'>
+                          {new Intl.DateTimeFormat('en-ID', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false,
+                          }).format(date)}
+                        </td>
+                        <td className='p-3'>
+                          <span
+                            className={`rounded px-2 py-1 text-sm ${
+                              att.status === 'Late'
+                                ? 'bg-red-100 text-red-600'
+                                : 'bg-green-100 text-green-600'
+                            }`}
+                          >
+                            {att.status}
+                          </span>
+                        </td>
+                        <td className='p-3'>
+                          <img
+                            src={`http://localhost:5002${att.photoUrl}`}
+                            alt='Attendance photo'
+                            className='h-14 w-14 cursor-pointer rounded-md border object-cover hover:opacity-80'
+                            onClick={() =>
+                              setSelectedPhoto(
+                                `http://localhost:5002${att.photoUrl}`
+                              )
+                            }
+                          />
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {meta && (
+          <div className='mt-4 flex items-center justify-between'>
+            <Button
+              variant='outline'
+              disabled={page === 1}
+              onClick={() => setPage(page - 1)}
+            >
+              Previous
+            </Button>
+            <p className='text-muted-foreground text-sm'>
+              Page {meta.currentPage} of {meta.totalPages}
+            </p>
+            <Button
+              variant='outline'
+              disabled={page === meta.totalPages}
+              onClick={() => setPage(page + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        )}
+
+        {/* Modal for photo */}
+        {selectedPhoto && (
+          <div
+            className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'
+            onClick={() => setSelectedPhoto(null)}
+          >
+            <div
+              className='max-w-lg rounded bg-white p-4 shadow'
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={selectedPhoto}
+                alt='Full attendance view'
+                className='mx-auto max-h-[80vh] rounded'
+              />
+              <Button
+                className='mt-4 w-full'
+                onClick={() => setSelectedPhoto(null)}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        )}
+      </Main>
+    </>
   )
 }
