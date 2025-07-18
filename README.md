@@ -1,79 +1,65 @@
-# Shadcn Admin Dashboard
+# 🖥️ Aplikasi Absensi WFH - Frontend
 
-Admin Dashboard UI crafted with Shadcn and Vite. Built with responsiveness and accessibility in mind.
+Aplikasi **frontend (client-side)** untuk platform **Absensi WFH**.  
+Aplikasi ini berinteraksi dengan backend **microservices** seperti **User Service** & **Attendance Service** untuk menyediakan antarmuka pengguna yang interaktif.
 
-![alt text](public/images/shadcn-admin.png)
+---
 
-I've been creating dashboard UIs at work and for my personal projects. I always wanted to make a reusable collection of dashboard UI for future projects; and here it is now. While I've created a few custom components, some of the code is directly adapted from ShadcnUI examples.
+## ✨ Tampilan
 
-> This is not a starter project (template) though. I'll probably make one in the future.
+- Login Page (untuk login karyawan dan admin ke dalam sistem)
+![alt text](image.png)
 
-## Features
+- Daily Attendance (untuk melakukan absensi harian)
+![alt text](image-1.png)
+![alt text](image-2.png)
 
-- Light/dark mode
-- Responsive
-- Accessible
-- With built-in Sidebar component
-- Global Search Command
-- 10+ pages
-- Extra custom components
+- Attendance History (untuk melihat riwayat absensi)
+![alt text](image-3.png)
 
-## Tech Stack
+- Manage Employees (untuk admin untuk mengelola karyawan)
+![alt text](image-4.png)
 
-**UI:** [ShadcnUI](https://ui.shadcn.com) (TailwindCSS + RadixUI)
+- Attendance Control (untuk admin melihat absensi karyawan (view only))
+![alt text](image-5.png)
 
-**Build Tool:** [Vite](https://vitejs.dev/)
+## ✨ Fitur Utama
 
-**Routing:** [TanStack Router](https://tanstack.com/router/latest)
+✅ **Login Page**  
+Halaman login untuk masuk ke aplikasi menggunakan JWT.
 
-**Type Checking:** [TypeScript](https://www.typescriptlang.org/)
+✅ **Daily Attendance**  
+Halaman utama setelah login, menampilkan fungsi absensi harian (take photo atau upload photo)
 
-**Linting/Formatting:** [Eslint](https://eslint.org/) & [Prettier](https://prettier.io/)
+✅ **History**  
+Halaman History untuk melihat riwayat absensi.
 
-**Icons:** [Tabler Icons](https://tabler.io/icons)
+✅ **Manage Employees (Admin)**  
+Halaman untuk manajemen karyawan (admin) untuk menambah, mengubah, atau menghapus karyawan.
 
-**Auth (partial):** [Clerk](https://go.clerk.com/GttUAaK)
+✅ **Attendance Control**  
+Halaman (view) untuk melihat riwayat absensi.
 
-## Run Locally
+---
 
-Clone the project
+## 🚀 Teknologi yang Digunakan
+
+- **[Vite](https://vitejs.dev/)** → Build tool modern untuk React
+- **[React](https://react.dev/)** → Library untuk membangun antarmuka pengguna
+- **[TanStack Router](https://tanstack.com/router)** → Type-safe routing untuk React
+- **[Axios](https://axios-http.com/)** → Client HTTP untuk komunikasi API backend
+- **[shadcn/ui](https://ui.shadcn.com/)** → Komponen UI yang reusable
+- **[Tailwind CSS](https://tailwindcss.com/)** → Framework CSS untuk styling
+- **[Lucide React](https://lucide.dev/)** → Library ikon ringan & modern
+- **[js-cookie](https://github.com/js-cookie/js-cookie)** → Mengelola JWT (token otentikasi) di browser
+
+---
+
+## ⚙️ Cara Instalasi & Menjalankan
+
+### 1️⃣ Clone Repository
 
 ```bash
-  git clone https://github.com/satnaing/shadcn-admin.git
+git clone https://github.com/your-username/absensi-wfh-frontend.git
+cd absensi-wfh-frontend
 ```
-
-Go to the project directory
-
-```bash
-  cd shadcn-admin
-```
-
-Install dependencies
-
-```bash
-  pnpm install
-```
-
-Start the server
-
-```bash
-  pnpm run dev
-```
-
-## Sponsoring this project ❤️
-
-If you find this project helpful or use this in your own work, consider [sponsoring me](https://github.com/sponsors/satnaing) to support development and maintenance. You can [buy me a coffee](https://buymeacoffee.com/satnaing) as well. Don’t worry, every penny helps. Thank you! 🙏
-
-For questions or sponsorship inquiries, feel free to reach out at [contact@satnaing.dev](mailto:contact@satnaing.dev).
-
-### Current Sponsor
-
-- [Clerk](https://go.clerk.com/GttUAaK) - for backing the implementation of Clerk in this project
-
-## Author
-
-Crafted with 🤍 by [@satnaing](https://github.com/satnaing)
-
-## License
-
-Licensed under the [MIT License](https://choosealicense.com/licenses/mit/)
