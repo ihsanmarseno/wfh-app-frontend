@@ -55,7 +55,7 @@ Halaman History untuk melihat riwayat absensi.
 Halaman untuk manajemen karyawan (admin) untuk menambah, mengubah, atau menghapus karyawan.
 
 ✅ **Attendance Control**  
-Halaman (view) untuk melihat riwayat absensi.
+Halaman (view) untuk melihat riwayat absensi karyawan (admin).
 
 ---
 
