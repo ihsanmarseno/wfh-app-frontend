@@ -36,6 +36,10 @@ Aplikasi ini berinteraksi dengan backend **microservices** seperti **User Servic
 
   ![alt text](image-7.png)
 
+- Modal Delete Employee (Admin)
+
+  ![alt text](image-8.png)
+
 ## ✨ Fitur Utama
 
 ✅ **Login Page**  
