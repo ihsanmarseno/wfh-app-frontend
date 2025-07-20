@@ -8,20 +8,33 @@ Aplikasi ini berinteraksi dengan backend **microservices** seperti **User Servic
 ## ✨ Tampilan
 
 - Login Page (Admin dan Karyawan)
+
   ![alt text](image.png)
 
 - Daily Attendance (Admin dan Karyawan)
+
   ![alt text](image-1.png)
   ![alt text](image-2.png)
 
 - Attendance History (Admin dan Karyawan)
+
   ![alt text](image-3.png)
 
 - Manage Employees (Admin)
+
   ![alt text](image-4.png)
 
 - Attendance Control (Admin)
+
   ![alt text](image-5.png)
+
+- Modal Add Employee (Admin)
+
+  ![alt text](image-6.png)
+
+- Modal Edit Employee (Admin)
+
+  ![alt text](image-7.png)
 
 ## ✨ Fitur Utama
 
