@@ -51,7 +51,10 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
     try {
-      const response = await axios.post(`${userServiceUrl}/auth/login`, data)
+      const response = await axios.post(
+        `${userServiceUrl}/v1/api/auth/login`,
+        data
+      )
 
       if (!response.data) {
         throw new Error('Login failed')

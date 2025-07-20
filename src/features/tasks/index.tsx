@@ -3,11 +3,22 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+// ✅ Impor komponen Tabel
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+
+// Pastikan path ini benar
 
 interface Attendance {
   id: number
@@ -29,23 +40,30 @@ export default function AttendanceHistory() {
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(1)
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null)
+  const attendanceServiceUrl = import.meta.env.VITE_ATTENDANCE_SERVICE_URL
 
   const fetchAttendance = async (pageNum: number) => {
-    setLoading(true)
-    const res = await axios.get(
-      `http://localhost:5002/v1/api/attendance/my-history?page=${pageNum}&pageSize=5`,
-      {
-        headers: { Authorization: `Bearer ${Cookies.get('token')}` },
-      }
-    )
-    setAttendances(res.data.data)
-    setMeta(res.data.meta)
-    setLoading(false)
+    try {
+      setLoading(true)
+      const res = await axios.get(
+        `${attendanceServiceUrl}/v1/api/attendance/my-history?page=${pageNum}&pageSize=5`,
+        {
+          headers: { Authorization: `Bearer ${Cookies.get('token')}` },
+        }
+      )
+      setAttendances(res.data.data)
+      setMeta(res.data.meta)
+    } catch (error) {
+      console.error('Failed to fetch attendance history:', error)
+      // Tambahkan notifikasi error jika perlu
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => {
     fetchAttendance(page)
-  }, [page])
+  }, [page, attendanceServiceUrl]) // Tambahkan dependency jika URL bisa berubah
 
   return (
     <>
@@ -75,69 +93,68 @@ export default function AttendanceHistory() {
               <Loader2 className='text-muted-foreground h-8 w-8 animate-spin' />
             </div>
           ) : (
-            <div className='overflow-x-auto rounded-md border shadow-sm'>
-              <table className='w-full text-left'>
-                <thead className='bg-muted text-sm'>
-                  <tr>
-                    <th className='p-3'>Date</th>
-                    <th className='p-3'>Time</th>
-                    <th className='p-3'>Status</th>
-                    <th className='p-3'>Photo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {attendances.map((att) => {
-                    const date = new Date(att.clockInTime)
-                    return (
-                      <tr key={att.id} className='hover:bg-muted/30 border-b'>
-                        <td className='p-3'>
-                          {new Intl.DateTimeFormat('en-US', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          }).format(date)}
-                        </td>
-                        <td className='p-3'>
-                          {new Intl.DateTimeFormat('en-ID', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: false,
-                          }).format(date)}
-                        </td>
-                        <td className='p-3'>
-                          <span
-                            className={`rounded px-2 py-1 text-sm ${
-                              att.status === 'Late'
-                                ? 'bg-red-100 text-red-600'
-                                : 'bg-green-100 text-green-600'
-                            }`}
-                          >
-                            {att.status}
-                          </span>
-                        </td>
-                        <td className='p-3'>
-                          <img
-                            src={`http://localhost:5002${att.photoUrl}`}
-                            alt='Attendance photo'
-                            className='h-14 w-14 cursor-pointer rounded-md border object-cover hover:opacity-80'
-                            onClick={() =>
-                              setSelectedPhoto(
-                                `http://localhost:5002${att.photoUrl}`
-                              )
-                            }
-                          />
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+            // ✅ Menggunakan komponen Tabel kustom
+            <Table className='border shadow-sm'>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Time</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Photo</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {attendances.map((att) => {
+                  const date = new Date(att.clockInTime)
+                  return (
+                    <TableRow key={att.id}>
+                      <TableCell>
+                        {new Intl.DateTimeFormat('en-US', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        }).format(date)}
+                      </TableCell>
+                      <TableCell>
+                        {new Intl.DateTimeFormat('en-ID', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false,
+                        }).format(date)}
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`rounded px-2 py-1 text-sm ${
+                            att.status === 'Late'
+                              ? 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300'
+                              : 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'
+                          }`}
+                        >
+                          {att.status}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <img
+                          src={`${attendanceServiceUrl}${att.photoUrl}`}
+                          alt='Attendance'
+                          className='h-14 w-14 cursor-pointer rounded-md border object-cover hover:opacity-80'
+                          onClick={() =>
+                            setSelectedPhoto(
+                              `${attendanceServiceUrl}${att.photoUrl}`
+                            )
+                          }
+                        />
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
           )}
         </div>
 
-        {meta && (
+        {meta && meta.totalItems > 0 && (
           <div className='mt-4 flex items-center justify-between'>
             <Button
               variant='outline'
@@ -151,7 +168,7 @@ export default function AttendanceHistory() {
             </p>
             <Button
               variant='outline'
-              disabled={page === meta.totalPages}
+              disabled={page === meta.totalPages || meta.totalPages === 0}
               onClick={() => setPage(page + 1)}
             >
               Next
@@ -162,11 +179,11 @@ export default function AttendanceHistory() {
         {/* Modal for photo */}
         {selectedPhoto && (
           <div
-            className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'
+            className='animate-in fade-in-0 fixed inset-0 z-50 flex items-center justify-center bg-black/60'
             onClick={() => setSelectedPhoto(null)}
           >
             <div
-              className='max-w-lg rounded bg-white p-4 shadow'
+              className='bg-background max-w-lg rounded-lg p-4 shadow-lg'
               onClick={(e) => e.stopPropagation()}
             >
               <img

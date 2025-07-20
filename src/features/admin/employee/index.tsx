@@ -5,28 +5,39 @@ import { Loader2, Plus, Pencil, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogTitle,
-  AlertDialogCancel,
   AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+// ✅ Impor komponen Tabel
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+
+// Pastikan path ini benar
 
 interface User {
   id: number
@@ -51,11 +62,9 @@ export default function ManageEmployees() {
 
   const userServiceUrl = import.meta.env.VITE_USER_SERVICE_URL
 
-  // Modal state
+  // State untuk modal dan form
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
-
-  // Form state
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -63,26 +72,32 @@ export default function ManageEmployees() {
     password: '',
   })
 
-  // AlertDialog state
+  // State untuk dialog konfirmasi hapus
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [deletingUser, setDeletingUser] = useState<User | null>(null)
 
   const fetchUsers = async (pageNum: number) => {
     setLoading(true)
-    const res = await axios.get(
-      `${userServiceUrl}/auth/users?page=${pageNum}&pageSize=5`,
-      {
-        headers: { Authorization: `Bearer ${Cookies.get('token')}` },
-      }
-    )
-    setUsers(res.data.data)
-    setMeta(res.data.meta)
-    setLoading(false)
+    try {
+      const res = await axios.get(
+        `${userServiceUrl}/v1/api/auth/users?page=${pageNum}&pageSize=5`,
+        {
+          headers: { Authorization: `Bearer ${Cookies.get('token')}` },
+        }
+      )
+      setUsers(res.data.data)
+      setMeta(res.data.meta)
+    } catch (error) {
+      toast.error('Failed to fetch users.')
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => {
     fetchUsers(page)
-  }, [page])
+  }, [page, userServiceUrl])
 
   const openAddModal = () => {
     setEditingUser(null)
@@ -96,7 +111,7 @@ export default function ManageEmployees() {
       name: user.name,
       email: user.email,
       role: user.role,
-      password: '',
+      password: '', // Kosongkan password saat edit
     })
     setIsModalOpen(true)
   }
@@ -104,22 +119,22 @@ export default function ManageEmployees() {
   const handleSave = async () => {
     try {
       if (editingUser) {
-        // update
+        // Logika untuk update
         await axios.put(
-          `${userServiceUrl}/auth/users/${editingUser.id}`,
+          `${userServiceUrl}/v1/api/auth/users/${editingUser.id}`,
           formData,
           { headers: { Authorization: `Bearer ${Cookies.get('token')}` } }
         )
         toast.success('Employee updated successfully')
       } else {
-        // create
-        await axios.post(`${userServiceUrl}/auth/users`, formData, {
+        // Logika untuk create
+        await axios.post(`${userServiceUrl}/v1/api/auth/users`, formData, {
           headers: { Authorization: `Bearer ${Cookies.get('token')}` },
         })
         toast.success('Employee created successfully')
       }
       setIsModalOpen(false)
-      fetchUsers(page)
+      fetchUsers(page) // Refresh data
     } catch (err: any) {
       toast.error(err.response?.data?.msg || 'Failed to save employee')
     }
@@ -133,12 +148,20 @@ export default function ManageEmployees() {
   const handleDelete = async () => {
     if (!deletingUser) return
     try {
-      await axios.delete(`${userServiceUrl}/auth/users/${deletingUser.id}`, {
-        headers: { Authorization: `Bearer ${Cookies.get('token')}` },
-      })
+      await axios.delete(
+        `${userServiceUrl}/v1/api/auth/users/${deletingUser.id}`,
+        {
+          headers: { Authorization: `Bearer ${Cookies.get('token')}` },
+        }
+      )
       toast.success('Employee deleted successfully')
       setIsDeleteOpen(false)
-      fetchUsers(page)
+      // Jika halaman menjadi kosong setelah hapus, kembali ke halaman sebelumnya
+      if (users.length === 1 && page > 1) {
+        setPage(page - 1)
+      } else {
+        fetchUsers(page)
+      }
     } catch (err: any) {
       toast.error(err.response?.data?.msg || 'Failed to delete employee')
     }
@@ -175,65 +198,60 @@ export default function ManageEmployees() {
               <Loader2 className='text-muted-foreground h-8 w-8 animate-spin' />
             </div>
           ) : (
-            <div className='overflow-x-auto rounded-md border shadow-sm'>
-              <table className='w-full text-left'>
-                <thead className='bg-muted text-sm'>
-                  <tr>
-                    <th className='p-3'>Name</th>
-                    <th className='p-3'>Email</th>
-                    <th className='p-3'>Role</th>
-                    <th className='p-3'>Joined</th>
-                    <th className='p-3 text-right'>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((user) => {
-                    const joinedDate = new Date(user.createdAt)
-                    return (
-                      <tr key={user.id} className='hover:bg-muted/30 border-b'>
-                        <td className='p-3 font-medium'>{user.name}</td>
-                        <td className='p-3'>{user.email}</td>
-                        <td className='p-3'>
-                          <span
-                            className={`rounded px-2 py-1 text-sm ${
-                              user.role === 'admin'
-                                ? 'bg-purple-100 text-purple-700'
-                                : 'bg-blue-100 text-blue-700'
-                            }`}
-                          >
-                            {user.role}
-                          </span>
-                        </td>
-                        <td className='p-3'>
-                          {joinedDate.toLocaleDateString()}{' '}
-                          {joinedDate.toLocaleTimeString()}
-                        </td>
-                        <td className='space-x-2 p-3 text-right'>
-                          <Button
-                            size='sm'
-                            variant='outline'
-                            onClick={() => openEditModal(user)}
-                          >
-                            <Pencil className='h-4 w-4' />
-                          </Button>
-                          <Button
-                            size='sm'
-                            variant='destructive'
-                            onClick={() => confirmDelete(user)}
-                          >
-                            <Trash2 className='h-4 w-4' />
-                          </Button>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+            // ✅ Menggunakan komponen Tabel kustom
+            <Table className='border shadow-sm'>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Joined</TableHead>
+                  <TableHead className='text-right'>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell className='font-medium'>{user.name}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`rounded px-2 py-1 text-xs font-medium ${
+                          user.role === 'admin'
+                            ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300'
+                            : 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300'
+                        }`}
+                      >
+                        {user.role}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className='space-x-2 text-right'>
+                      <Button
+                        size='icon'
+                        variant='outline'
+                        onClick={() => openEditModal(user)}
+                      >
+                        <Pencil className='h-4 w-4' />
+                      </Button>
+                      <Button
+                        size='icon'
+                        variant='destructive'
+                        onClick={() => confirmDelete(user)}
+                      >
+                        <Trash2 className='h-4 w-4' />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           )}
         </div>
 
-        {meta && (
+        {meta && meta.totalItems > 0 && (
           <div className='mt-4 flex items-center justify-between'>
             <Button
               variant='outline'
@@ -247,7 +265,7 @@ export default function ManageEmployees() {
             </p>
             <Button
               variant='outline'
-              disabled={page === meta.totalPages}
+              disabled={page === meta.totalPages || meta.totalPages === 0}
               onClick={() => setPage(page + 1)}
             >
               Next
@@ -256,19 +274,21 @@ export default function ManageEmployees() {
         )}
       </Main>
 
-      {/* Modal for Add/Edit */}
+      {/* Modal untuk Tambah/Edit */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingUser ? 'Edit Employee' : 'Add Employee'}
+              {editingUser ? 'Edit Employee' : 'Add New Employee'}
             </DialogTitle>
           </DialogHeader>
-
-          <div className='space-y-4'>
+          <div className='space-y-4 py-2'>
             <div>
-              <Label className='mb-2'>Name</Label>
+              <Label htmlFor='name' className='mb-2'>
+                Name
+              </Label>
               <Input
+                id='name'
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
@@ -276,8 +296,12 @@ export default function ManageEmployees() {
               />
             </div>
             <div>
-              <Label className='mb-2'>Email</Label>
+              <Label htmlFor='email' className='mb-2'>
+                Email
+              </Label>
               <Input
+                id='email'
+                type='email'
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
@@ -286,8 +310,11 @@ export default function ManageEmployees() {
             </div>
             {!editingUser && (
               <div>
-                <Label className='mb-2'>Password</Label>
+                <Label htmlFor='password' className='mb-2'>
+                  Password
+                </Label>
                 <Input
+                  id='password'
                   type='password'
                   value={formData.password}
                   onChange={(e) =>
@@ -297,9 +324,12 @@ export default function ManageEmployees() {
               </div>
             )}
             <div>
-              <Label className='mb-2'>Role</Label>
+              <Label htmlFor='role' className='mb-2'>
+                Role
+              </Label>
               <select
-                className='w-full rounded border p-2'
+                id='role'
+                className='w-full rounded-md border bg-transparent p-2'
                 value={formData.role}
                 onChange={(e) =>
                   setFormData({ ...formData, role: e.target.value })
@@ -310,7 +340,6 @@ export default function ManageEmployees() {
               </select>
             </div>
           </div>
-
           <DialogFooter>
             <Button variant='outline' onClick={() => setIsModalOpen(false)}>
               Cancel
@@ -322,12 +351,14 @@ export default function ManageEmployees() {
         </DialogContent>
       </Dialog>
 
-      {/* AlertDialog for Delete */}
+      {/* Dialog Konfirmasi Hapus */}
       <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <p>This will permanently delete {deletingUser?.name}'s account.</p>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <p className='text-muted-foreground'>
+              This will permanently delete the account for {deletingUser?.name}.
+            </p>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>

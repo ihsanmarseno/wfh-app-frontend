@@ -178,7 +178,7 @@ export default function Dashboard() {
                   videoConstraints={videoConstraints}
                   className='w-full rounded-md border'
                 />
-                <div className='flex justify-around'>
+                <div className='flex justify-between'>
                   <Button onClick={capturePhoto} size='lg'>
                     Capture
                   </Button>
@@ -212,7 +212,7 @@ export default function Dashboard() {
                 </div>
               </div>
             ) : (
-              <div className='flex w-full flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4'>
+              <div className='flex w-full justify-between space-x-4'>
                 <input
                   type='file'
                   accept='image/*'
@@ -221,7 +221,7 @@ export default function Dashboard() {
                   onChange={handleFileChange}
                 />
 
-                <Button onClick={openCamera} className='flex-1' size='lg'>
+                <Button onClick={openCamera} size='lg'>
                   <Camera className='mr-2 h-5 w-5' /> Take Photo
                 </Button>
 
@@ -229,7 +229,6 @@ export default function Dashboard() {
                   onClick={() =>
                     document.getElementById('photo-upload')?.click()
                   }
-                  className='flex-1'
                   size='lg'
                 >
                   <Upload className='mr-2 h-5 w-5' /> Upload Photo
